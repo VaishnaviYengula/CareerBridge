@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, Input, Select, Button, Label } from '../components/UI';
 import { UserProfile } from '../types';
@@ -6,16 +7,20 @@ import { FIELDS, VISA_TYPES } from '../constants';
 interface ProfileProps {
   user: UserProfile;
   onUpdate: (user: UserProfile) => void;
+  onComplete?: () => void;
 }
 
-const Profile: React.FC<ProfileProps> = ({ user, onUpdate }) => {
+const Profile: React.FC<ProfileProps> = ({ user, onUpdate, onComplete }) => {
   const handleChange = (field: keyof UserProfile, value: string) => {
     onUpdate({ ...user, [field]: value });
   };
 
+  const isFormValid = user.name.trim() !== '' && user.field !== '' && user.visaType !== '';
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 pt-24">
-      <h1 className="text-4xl font-bold mb-10 text-center tracking-tight">Your Profile</h1>
+      <h1 className="text-4xl font-bold mb-4 text-center tracking-tight">Your Profile</h1>
+      <p className="text-center text-gray-500 mb-10 max-w-md mx-auto">Fill in your details to unlock AI-powered job matching and interview coaching.</p>
       
       <div className="space-y-10">
         <Card className="border-t-4 border-t-charcoal">
@@ -25,18 +30,24 @@ const Profile: React.FC<ProfileProps> = ({ user, onUpdate }) => {
           <div className="grid gap-8">
             <div>
               <Label>Full Name</Label>
-              <Input value={user.name} onChange={(e) => handleChange('name', e.target.value)} />
+              <Input 
+                placeholder="How should we address you?"
+                value={user.name} 
+                onChange={(e) => handleChange('name', e.target.value)} 
+              />
             </div>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <Label>Field of Study</Label>
                 <Select value={user.field} onChange={(e) => handleChange('field', e.target.value)}>
+                  <option value="">Select your field...</option>
                   {FIELDS.map(f => <option key={f} value={f}>{f}</option>)}
                 </Select>
               </div>
               <div>
                 <Label>Current Visa Status</Label>
                 <Select value={user.visaType} onChange={(e) => handleChange('visaType', e.target.value)}>
+                  <option value="">Select your visa status...</option>
                   {VISA_TYPES.map(v => <option key={v} value={v}>{v}</option>)}
                 </Select>
               </div>
@@ -73,9 +84,20 @@ const Profile: React.FC<ProfileProps> = ({ user, onUpdate }) => {
         </Card>
 
         <div className="flex flex-col sm:flex-row gap-4">
-          <Button className="flex-1 py-4 text-base" size="lg">Save All Changes</Button>
+          <Button 
+            className="flex-1 py-4 text-base" 
+            size="lg" 
+            disabled={!isFormValid}
+            onClick={onComplete}
+          >
+            Save & Enter Dashboard
+          </Button>
           <Button variant="outline" className="flex-1 py-4 text-base" size="lg">Export Profile (PDF)</Button>
         </div>
+        
+        {!isFormValid && (
+          <p className="text-center text-xs text-red-500 font-bold uppercase tracking-widest">Please fill in your name, field, and visa type to continue.</p>
+        )}
       </div>
     </div>
   );

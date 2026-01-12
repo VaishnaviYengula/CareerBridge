@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, Button } from '../components/UI';
 import { Page, UserProfile } from '../types';
@@ -8,6 +9,19 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ user, onNavigate }) => {
+  const isNewUser = !user.name;
+
+  if (isNewUser) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-12 pt-32 text-center">
+        <div className="w-24 h-24 bg-pastel-yellow rounded-full flex items-center justify-center mx-auto mb-8 text-4xl shadow-sm">👋</div>
+        <h1 className="text-4xl font-bold mb-4 tracking-tight">Welcome to CareerBridge</h1>
+        <p className="text-gray-600 mb-8 text-lg max-w-md mx-auto">To provide personalized job matching and CV optimization, we need to know a bit about your background and goals.</p>
+        <Button size="lg" onClick={() => onNavigate(Page.Profile)}>Set up your Profile</Button>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-12 pt-24">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
@@ -17,7 +31,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onNavigate }) => {
         </div>
         <div className="bg-[#FEF9E7] px-6 py-3 rounded-2xl border-2 border-yellow-200/50 shadow-sm">
           <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Active Visa</p>
-          <p className="font-bold text-charcoal">{user.visaType}</p>
+          <p className="font-bold text-charcoal">{user.visaType || 'Not specified'}</p>
         </div>
       </div>
 

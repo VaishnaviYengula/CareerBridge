@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Page, UserProfile } from './types';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -9,23 +9,45 @@ import CVTailor from './pages/CVTailor';
 import InterviewCoach from './pages/InterviewCoach';
 import Profile from './pages/Profile';
 
+const STORAGE_KEY = 'careerbridge_user_profile';
+
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>(Page.Home);
-  const [user, setUser] = useState<UserProfile>({
-    name: 'Sarah Chen',
-    field: 'Software Engineering',
-    skills: ['React', 'TypeScript', 'Node.js'],
-    visaType: 'VLS-TS Student',
-    languageLevel: 'B2',
-    preferences: 'Seeking 6-month internship in Paris starting March 2024.'
+  const [user, setUser] = useState<UserProfile>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return JSON.parse(saved);
+    return {
+      name: '',
+      field: '',
+      skills: [],
+      visaType: '',
+      languageLevel: '',
+      preferences: ''
+    };
   });
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+  }, [user]);
+
+  const isProfileComplete = user.name.trim().length > 0;
+
+  const navigateWithAuth = (page: Page) => {
+    if (page === Page.Home || page === Page.Profile) {
+      setCurrentPage(page);
+    } else if (!isProfileComplete) {
+      setCurrentPage(Page.Profile);
+    } else {
+      setCurrentPage(page);
+    }
+  };
 
   const renderPage = () => {
     switch (currentPage) {
       case Page.Home:
-        return <Home onStart={setCurrentPage} />;
+        return <Home onStart={navigateWithAuth} />;
       case Page.Dashboard:
-        return <Dashboard user={user} onNavigate={setCurrentPage} />;
+        return <Dashboard user={user} onNavigate={navigateWithAuth} />;
       case Page.JobSearch:
         return <JobSearch user={user} />;
       case Page.CVTailor:
@@ -33,15 +55,15 @@ const App: React.FC = () => {
       case Page.InterviewCoach:
         return <InterviewCoach user={user} />;
       case Page.Profile:
-        return <Profile user={user} onUpdate={setUser} />;
+        return <Profile user={user} onUpdate={setUser} onComplete={() => setCurrentPage(Page.Dashboard)} />;
       default:
-        return <Home onStart={setCurrentPage} />;
+        return <Home onStart={navigateWithAuth} />;
     }
   };
 
   return (
     <div className="min-h-screen bg-off-white flex flex-col">
-      <Navbar currentPage={currentPage} onNavigate={setCurrentPage} />
+      <Navbar currentPage={currentPage} onNavigate={navigateWithAuth} />
       
       <main className="flex-1">
         {renderPage()}
