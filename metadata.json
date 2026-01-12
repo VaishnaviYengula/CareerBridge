@@ -1,0 +1,8 @@
+{
+  "name": "CareerBridge",
+  "description": "An AI-powered career assistant for international students in France, offering smart job matching, CV tailoring to French standards, and an interactive interview coach.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
